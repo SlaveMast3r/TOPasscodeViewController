@@ -56,22 +56,35 @@ Download this project from GitHub, move the subfolder named 'TOPasscodeViewContr
 `TOPasscodeViewController` operates around a very strict modal implementation. It cannot be pushed to a `UINavigationController` stack, and must be presented as a full-screen dialog on an existing view controller.
 
 ### Basic Implementation
-```objc
-- (void)showButtonTapped:(id)sender
-{
-    TOPasscodeViewController *passcodeViewController = [[TOPasscodeViewController alloc] initWithStyle:TOPasscodeViewStyleTranslucentDark passcodeType:TOPasscodeTypeFourDigits];
-    passcodeViewController.delegate = self;
-    [self presentViewController:passcodeViewController animated:YES completion:nil];
-}
+```swift
+import UIKit
+import TOPasscodeViewController
 
-- (void)didTapCancelInPasscodeViewController:(TOPasscodeViewController *)passcodeViewController
-{
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (BOOL)passcodeViewController:(TOPasscodeViewController *)passcodeViewController isCorrectCode:(NSString *)code
-{
-    return [code isEqualToString:@"1234"];
+class TestController: UIViewController, TOPasscodeViewControllerDelegate {
+    
+    /// Show pin view on demand.
+    @IBAction func showPinView() {
+        let controller = TOPasscodeViewController(style: .translucentDark, passcodeType: .fourDigits)
+        
+        controller.delegate = self
+        self.present(controller, animated: true, completion: nil)
+    }
+    
+    /// The user tapped the 'Cancel' button. Any dismissing of confidential content should be done in here.
+    /// - Parameter passcodeViewController: instance of passcode controller
+    func didTapCancel(in passcodeViewController: TOPasscodeViewController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    
+    /// Return YES if the user entered the expected PIN code. Return NO if it was incorrect.
+    /// - Parameters:
+    ///   - passcodeViewController: instance of passcode controller
+    ///   - code: entered passcode to verify
+    func passcodeViewController(_ passcodeViewController: TOPasscodeViewController, isCorrectCode code: String) -> Bool {
+        return code == "1234"
+    }
+    
 }
 ```
 
